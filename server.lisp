@@ -22,7 +22,6 @@
    :name (machine-instance)
    :hostname "localhost"
    :port *default-port*
-   :thread NIL
    :ping-interval 60
    :connection-limit 100
    :client-class 'connection))
