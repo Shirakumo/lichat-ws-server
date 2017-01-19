@@ -7,6 +7,7 @@
 (in-package #:org.shirakumo.lichat.ws-server)
 
 (defvar *default-port* 1113)
+(defvar *servers* ())
 
 (defclass server (lichat-serverlib:flood-protected-server
                   hunchensocket:websocket-resource)
@@ -31,8 +32,13 @@
   ((lock :initform (bt:make-lock) :accessor lock)
    (status :initform :starting :accessor status))
   (:default-initargs
-   :user NIL
-   :socket (error "SOCKET required.")))
+   :user NIL))
+
+(defmethod print-object ((connection connection) stream)
+  (print-unreadable-object (connection stream :type T)
+    (format stream "~a/~a"
+            (when (lichat-serverlib:server connection) (lichat-protocol:name (lichat-serverlib:server connection)))
+            (when (lichat-protocol:user connection) (lichat-protocol:name (lichat-protocol:user connection))))))
 
 (defclass channel (lichat-serverlib:channel)
   ((lock :initform (bt:make-lock) :accessor lock)))
@@ -59,14 +65,23 @@
   (setf (thread server) (bt:make-thread (lambda ()
                                           (unwind-protect
                                                (handle-pings server)
-                                            (setf (thread server) NIL))))))
+                                            (setf (thread server) NIL)))))
+  (pushnew server *servers*))
+
+(defun dispatch-server (request)
+  (dolist (server *servers*)
+    (when (eql (hunchentoot:local-port request) (port server))
+      (return server))))
+
+(pushnew 'dispatch-server hunchensocket:*websocket-dispatch-table*)
 
 (defmethod close-connection ((server server))
   (unless (acceptor server)
     (error "No connection thread running."))
+  (bt:interrupt-thread (thread server) (lambda () (invoke-restart 'stop-handling)))
   (hunchentoot:stop (acceptor server))
   (setf (acceptor server) NIL)
-  (bt:interrupt-thread (thread server) (lambda () (invoke-restart 'stop-handling))))
+  (setf *servers* (remove server *servers*)))
 
 (defmethod handle-pings ((server server))
   (with-simple-restart (stop-handling "Stop handling pings.")
@@ -80,7 +95,8 @@
                    (lichat-serverlib:send! connection 'ping)))))))
 
 (defmethod hunchensocket:client-connected ((server server) (connection connection))
-  (setf (server connection) server)
+  (v:info :lichat.server "~a: Establishing connection..." server)
+  (setf (lichat-serverlib:server connection) server)
   (cond ((<= (connection-limit server) (length (connections server)))
          (lichat-serverlib:send! connection 'too-many-connections)
          (ignore-errors (hunchensocket:close-connection connection :reason "Too many connections.")))
@@ -91,6 +107,7 @@
   (lichat-serverlib:teardown-connection connection))
 
 (defmethod hunchensocket:text-message-received ((server server) (connection connection) message)
+  (v:trace :test "~a: Handling ~s" connection message)
   (restart-case
       (with-input-from-string (in message)
         (case (status connection)
