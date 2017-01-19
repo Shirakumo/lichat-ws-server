@@ -66,7 +66,8 @@
                                           (unwind-protect
                                                (handle-pings server)
                                             (setf (thread server) NIL)))))
-  (pushnew server *servers*))
+  (pushnew server *servers*)
+  server)
 
 (defun dispatch-server (request)
   (dolist (server *servers*)
@@ -78,10 +79,12 @@
 (defmethod close-connection ((server server))
   (unless (acceptor server)
     (error "No connection thread running."))
-  (bt:interrupt-thread (thread server) (lambda () (invoke-restart 'stop-handling)))
+  (when (thread server)
+    (bt:interrupt-thread (thread server) (lambda () (invoke-restart 'stop-handling))))
   (hunchentoot:stop (acceptor server))
   (setf (acceptor server) NIL)
-  (setf *servers* (remove server *servers*)))
+  (setf *servers* (remove server *servers*))
+  server)
 
 (defmethod handle-pings ((server server))
   (with-simple-restart (stop-handling "Stop handling pings.")
