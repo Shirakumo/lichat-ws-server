@@ -146,10 +146,11 @@
 
 (defmethod lichat-serverlib:teardown-connection :after ((connection connection))
   (unless (eql (status connection) :stopping)
-    (v:info :lichat.server "~a: Closing ~a" (lichat-serverlib:server connection) connection)
-    (setf (status connection) :stopping)
-    (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))
-    (setf (connections server) (remove connection (connections server)))))
+    (let ((server (lichat-serverlib:server connection)))
+      (v:info :lichat.server "~a: Closing ~a" server connection)
+      (setf (status connection) :stopping)
+      (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))
+      (setf (connections server) (remove connection (connections server))))))
 
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
   (v:trace :lichat.server "~a: Sending ~s to ~a" (lichat-serverlib:server connection) object connection)
