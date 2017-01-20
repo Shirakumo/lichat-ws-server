@@ -95,7 +95,11 @@
                  (when (and (eql :running (status connection))
                             (<= (ping-interval server)
                                 (- (get-universal-time) (lichat-serverlib:last-update connection))))
-                   (lichat-serverlib:send! connection 'ping)))))))
+                   (restart-case
+                       (lichat-serverlib:send! connection 'ping)
+                     (lichat-serverlib:close-connection ()
+                       :report "Close the connection."
+                       (lichat-serverlib:teardown-connection connection)))))))))
 
 (defmethod hunchensocket:client-connected ((server server) (connection connection))
   (v:info :lichat.server "~a: Establishing connection..." server)
