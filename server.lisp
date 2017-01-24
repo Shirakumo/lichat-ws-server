@@ -62,6 +62,8 @@
                                          :address (hostname server) :port (port server)
                                          :message-log-destination NIL :access-log-destination NIL))
   (hunchentoot:start (acceptor server))
+  (v:info :lichat.server.ws "~a: Listening for incoming connections on ~a:~a"
+          server (hostname server) (port server))
   (setf (thread server) (bt:make-thread (lambda ()
                                           (unwind-protect
                                                (handle-pings server)
@@ -92,17 +94,21 @@
           do (sleep 0.1)
              (when (= 0 counter)
                (dolist (connection (connections server))
-                 (when (and (eql :running (status connection))
-                            (<= (ping-interval server)
-                                (- (get-universal-time) (lichat-serverlib:last-update connection))))
-                   (restart-case
-                       (lichat-serverlib:send! connection 'ping)
-                     (lichat-serverlib:close-connection ()
-                       :report "Close the connection."
-                       (lichat-serverlib:teardown-connection connection)))))))))
+                 (handler-case
+                     (when (and (eql :running (status connection))
+                                (<= (ping-interval server)
+                                    (- (get-universal-time) (lichat-serverlib:last-update connection))))
+                       (restart-case
+                           (lichat-serverlib:send! connection 'ping)
+                         (lichat-serverlib:close-connection ()
+                           :report "Close the connection."
+                           (lichat-serverlib:teardown-connection connection))))
+                   (error (err)
+                     (v:warn :lichat.server.ws err)))))))
+  (v:info :lichat.server.ws "Ping handling has stopped."))
 
 (defmethod hunchensocket:client-connected ((server server) (connection connection))
-  (v:info :lichat.server "~a: Establishing connection..." server)
+  (v:info :lichat.server.ws "~a: Establishing connection..." server)
   (setf (lichat-serverlib:server connection) server)
   (cond ((<= (connection-limit server) (length (connections server)))
          (lichat-serverlib:send! connection 'too-many-connections)
@@ -114,7 +120,7 @@
   (lichat-serverlib:teardown-connection connection))
 
 (defmethod hunchensocket:text-message-received ((server server) (connection connection) message)
-  (v:trace :test "~a: Handling ~s" connection message)
+  (v:trace :licht.server.ws "~a: Handling ~s" connection message)
   (restart-case
       (with-input-from-string (in message)
         (case (status connection)
@@ -140,24 +146,24 @@
       (lichat-serverlib:teardown-connection connection))))
 
 (defmethod (setf lichat-serverlib:find-channel) :before (channel name (server server))
-  (v:info :lichat.server "~a: Creating channel ~a" server channel))
+  (v:info :lichat.server.ws "~a: Creating channel ~a" server channel))
 
 (defmethod (setf lichat-serverlib:find-user) :before (user name (server server))
-  (v:info :lichat.server "~a: Creating user ~a" server user))
+  (v:info :lichat.server.ws "~a: Creating user ~a" server user))
 
 (defmethod (setf lichat-serverlib:find-profile) :before (profile name (server server))
-  (v:info :lichat.server "~a: Creating profile ~a" server profile))
+  (v:info :lichat.server.ws "~a: Creating profile ~a" server profile))
 
 (defmethod lichat-serverlib:teardown-connection :after ((connection connection))
   (unless (eql (status connection) :stopping)
     (let ((server (lichat-serverlib:server connection)))
-      (v:info :lichat.server "~a: Closing ~a" server connection)
+      (v:info :lichat.server.ws "~a: Closing ~a" server connection)
       (setf (status connection) :stopping)
       (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))
       (setf (connections server) (remove connection (connections server))))))
 
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
-  (v:trace :lichat.server "~a: Sending ~s to ~a" (lichat-serverlib:server connection) object connection)
+  (v:trace :lichat.server.ws "~a: Sending ~s to ~a" (lichat-serverlib:server connection) object connection)
   (let ((message (with-output-to-string (output)
                    (lichat-protocol:to-wire object output))))
     (bt:with-lock-held ((lock connection))
