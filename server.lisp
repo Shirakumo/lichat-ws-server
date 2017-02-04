@@ -123,24 +123,26 @@
   (v:trace :licht.server.ws "~a: Handling ~s" connection message)
   (restart-case
       (with-input-from-string (in message)
-        (case (status connection)
-          (:running
-           (lichat-serverlib:process connection in))
-          (:starting
-           (handler-case
-               (let ((message (lichat-protocol:from-wire in)))
-                 (etypecase message
-                   (lichat-protocol:connect
-                    (lichat-serverlib:process connection message)))
-                 (setf (status connection) :running))
-             (lichat-protocol:wire-condition (err)
-               (lichat-serverlib:send! connection 'malformed-update
-                                       :text (princ-to-string err))
-               (invoke-restart 'lichat-serverlib:close-connection))
-             (error (err)
-               (lichat-serverlib:send! connection 'failure
-                                       :text (princ-to-string err))
-               (invoke-restart 'lichat-serverlib:close-connection))))))
+        (handler-case
+            (case (status connection)
+              (:running
+               (lichat-serverlib:process connection in))
+              (:starting
+               (handler-case
+                   (let ((message (lichat-protocol:from-wire in)))
+                     (etypecase message
+                       (lichat-protocol:connect
+                        (lichat-serverlib:process connection message)))
+                     (setf (status connection) :running))
+                 (lichat-protocol:wire-condition (err)
+                   (lichat-serverlib:send! connection 'malformed-update
+                                           :text (princ-to-string err))
+                   (invoke-restart 'lichat-serverlib:close-connection)))))
+          (error (err)
+            (v:error :lichat.server.ws err)
+            (lichat-serverlib:send! connection 'failure
+                                    :text (princ-to-string err))
+            (invoke-restart 'lichat-serverlib:close-connection))))
     (lichat-serverlib:close-connection ()
       :report "Close the connection."
       (lichat-serverlib:teardown-connection connection))))
