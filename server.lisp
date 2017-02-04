@@ -145,15 +145,6 @@
       :report "Close the connection."
       (lichat-serverlib:teardown-connection connection))))
 
-(defmethod (setf lichat-serverlib:find-channel) :before (channel name (server server))
-  (v:info :lichat.server.ws "~a: Creating channel ~a" server channel))
-
-(defmethod (setf lichat-serverlib:find-user) :before (user name (server server))
-  (v:info :lichat.server.ws "~a: Creating user ~a" server user))
-
-(defmethod (setf lichat-serverlib:find-profile) :before (profile name (server server))
-  (v:info :lichat.server.ws "~a: Creating profile ~a" server profile))
-
 (defmethod lichat-serverlib:teardown-connection :after ((connection connection))
   (unless (eql (status connection) :stopping)
     (let ((server (lichat-serverlib:server connection)))
