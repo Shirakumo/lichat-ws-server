@@ -152,8 +152,8 @@
     (let ((server (lichat-serverlib:server connection)))
       (v:info :lichat.server.ws "~a: Closing ~a" server connection)
       (setf (status connection) :stopping)
-      (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))
-      (setf (connections server) (remove connection (connections server))))))
+      (setf (connections server) (remove connection (connections server)))
+      (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect")))))
 
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
   (v:trace :lichat.server.ws "~a: Sending ~s to ~a" (lichat-serverlib:server connection) object connection)
