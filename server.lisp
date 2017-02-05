@@ -160,7 +160,10 @@
   (let ((message (with-output-to-string (output)
                    (lichat-protocol:to-wire object output))))
     (bt:with-lock-held ((lock connection))
-      (hunchensocket:send-text-message connection message))))
+      (handler-case
+          (hunchensocket:send-text-message connection message)
+        (error (err)
+          (v:severe :lichat.server.ws "Failed to send to ~s: ~a" connection err))))))
 
 ;;; Handle synchronising
 ;; FIXME: I'm not entirely convinced the mutual exclusion
