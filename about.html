@@ -73,9 +73,9 @@
       }
       @media (max-width: 800px){
           body{font-size: 12pt;}
-      } </style> </head> <body> <header> <h1>lichat-ws-server</h1> <span class="version">1.0.0</span> <p class="description">A simple WebSocket server implementation for lichat.</p> </header> <main> <article id="documentation">  <div><h2>About Lichat-WS-Server</h2> <p>This is a simple, threaded, WebSocket-based server for the <a href="https://shirakumo.org/projects/lichat-protocol">Lichat protocol</a>.</p> <h2>How To</h2> <p>Create a new server instance and pass it whatever settings you would like.</p> <pre><code>(<a href="http://l1sp.org/cl/defvar">defvar</a> *server* (<a href="http://l1sp.org/cl/make-instance">make-instance</a> 'lichat-ws-server:server))</code></pre> <p>Notable initargs of potential interest are:</p> <ul> <li><code>:name</code> The name the server goes by on its own network. Defaults to <code>(<a href="http://l1sp.org/cl/machine-instance">machine-instance</a>)</code>.</li> <li><code>:hostname</code> The hostname to which the TCP listener should bind. The default is <code>0.0.0.0</code>.</li> <li><code>:port</code> The port the TCP listener should listen on. The default is <code>1111</code>.</li> <li><code>:ping-interval</code> The interval in which pings should be sent out to clients. The default is <code>60</code>.</li> <li><code>:salt</code> The salt with which passwords are hashed. The default is an empty string.</li> <li><code>:idle-timeout</code> The number of seconds without a response from a client after which it is considered to have timed out. The default is <code>120</code>.</li> <li><code>:flood-frame</code> The size of a flood prevention frame. The default is <code>30</code>.</li> <li><code>:flood-limit</code> The number of allowed updates within a frame before flood limitation takes effect. The default is <code>40</code>.</li> <li><code>:connection-limit</code> The number of connections in total that the server supports before dropping incoming ones. The default is <code>100</code>.</li> </ul> <p>Once a server exists, it can be started to listen to incoming connections:</p> <pre><code>(<a href="#LICHAT-WS-SERVER:OPEN-CONNECTION">lichat-ws-server:open-connection</a> *server*)</code></pre> <p>The server logs information via <a href="http://shinmera.github.io/verbose/">Verbose</a>. If you set the REPL level to <code>:trace</code> you should see a bunch of status messages being printed every now and again.</p> <p>Once you're done with the server, you can shut it down again.</p> <pre><code>(<a href="#LICHAT-WS-SERVER:CLOSE-CONNECTION">lichat-ws-server:close-connection</a> *server*)</code></pre> <h2>Also See</h2> <ul> <li><a href="https://shirakumo.github.io/lichat-protocol">lichat-protocol</a> The Lichat protocol specification.</li> <li><a href="https://shirakumo.github.io/lichat-serverlib">lichat-serverlib</a> An agnostic implementation of the server-side protocol.</li> <li><a href="https://shirakumo.github.io/lichat-tcp-server">lichat-tcp-server</a> A basic, threaded, TCP-based implementation of a Lichat server.</li> </ul> </div>  </article> <article id="copyright">  <h2>Copyright</h2> <span>lichat-ws-server</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license.  © <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span> .  This library can be obtained on <a href="https://github.com/Shirakumo/lichat-ws-server">https://github.com/Shirakumo/lichat-ws-server</a>.  </article>  <article id="symbol-index"> <h2>Package Index</h2> <ul><li class="package"> <h3> <a name="LICHAT-WS-SERVER" href="#LICHAT-WS-SERVER">LICHAT-WS-SERVER</a> <span class="nicknames">(ORG.SHIRAKUMO.LICHAT.WS-SERVER)</span> </h3> <ul><li> <a name="LICHAT-WS-SERVER:*DEFAULT-PORT*"> </a> <article> <header class="special"> <span class="type">special</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:*DEFAULT-PORT*">*DEFAULT-PORT*</a></code></h4>  </header> <pre class="docstring">The standard port on which the server will run.
+      } </style> </head> <body> <header> <h1>lichat-ws-server</h1> <span class="version">1.0.0</span> <p class="description">A simple WebSocket server implementation for lichat.</p> </header> <main> <article id="documentation">  <div><h2>About Lichat-WS-Server</h2> <p>This is a simple, threaded, WebSocket-based server for the <a href="https://shirakumo.org/projects/lichat-protocol">Lichat protocol</a>.</p> <h2>How To</h2> <p>Create a new server instance and pass it whatever settings you would like.</p> <pre><code>(<a href="http://l1sp.org/cl/defvar">defvar</a> *server* (<a href="http://l1sp.org/cl/make-instance">make-instance</a> 'lichat-ws-server:server))</code></pre> <p>Notable initargs of potential interest are:</p> <ul> <li><code>:name</code> The name the server goes by on its own network. Defaults to <code>(<a href="http://l1sp.org/cl/machine-instance">machine-instance</a>)</code>.</li> <li><code>:hostname</code> The hostname to which the TCP listener should bind. The default is <code>0.0.0.0</code>.</li> <li><code>:port</code> The port the TCP listener should listen on. The default is <code>1111</code>.</li> <li><code>:ping-interval</code> The interval in which pings should be sent out to clients. The default is <code>60</code>.</li> <li><code>:salt</code> The salt with which passwords are hashed. The default is an empty string.</li> <li><code>:idle-timeout</code> The number of seconds without a response from a client after which it is considered to have timed out. The default is <code>120</code>.</li> <li><code>:flood-frame</code> The size of a flood prevention frame. The default is <code>30</code>.</li> <li><code>:flood-limit</code> The number of allowed updates within a frame before flood limitation takes effect. The default is <code>40</code>.</li> <li><code>:connection-limit</code> The number of connections in total that the server supports before dropping incoming ones. The default is <code>100</code>.</li> </ul> <p>Once a server exists, it can be started to listen to incoming connections:</p> <pre><code>(<a href="#LICHAT-WS-SERVER:OPEN-CONNECTION">lichat-ws-server:open-connection</a> *server*)</code></pre> <p>The server logs information via <a href="http://shinmera.github.io/verbose/">Verbose</a>. If you set the REPL level to <code>:trace</code> you should see a bunch of status messages being printed every now and again.</p> <p>Once you're done with the server, you can shut it down again.</p> <pre><code>(<a href="#LICHAT-WS-SERVER:CLOSE-CONNECTION">lichat-ws-server:close-connection</a> *server*)</code></pre> <h2>Also See</h2> <ul> <li><a href="https://shirakumo.github.io/lichat-protocol">lichat-protocol</a> The Lichat protocol specification.</li> <li><a href="https://shirakumo.github.io/lichat-serverlib">lichat-serverlib</a> An agnostic implementation of the server-side protocol.</li> <li><a href="https://shirakumo.github.io/lichat-tcp-server">lichat-tcp-server</a> A basic, threaded, TCP-based implementation of a Lichat server.</li> </ul> </div>  </article> <article id="copyright">  <h2>Copyright</h2> <span>lichat-ws-server</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license.  © <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span> .  This library can be obtained on <a href="https://github.com/Shirakumo/lichat-ws-server">https://github.com/Shirakumo/lichat-ws-server</a>.  </article>  <article id="symbol-index"> <h2>Package Index</h2> <ul><li class="package"> <h3> <a name="LICHAT-WS-SERVER" href="#LICHAT-WS-SERVER">LICHAT-WS-SERVER</a> <span class="nicknames">(ORG.SHIRAKUMO.LICHAT.WS-SERVER)</span> </h3> <ul><li> <a name="LICHAT-WS-SERVER:*DEFAULT-PORT*"> </a> <article> <header class="special"> <span class="type">special</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:*DEFAULT-PORT*">*DEFAULT-PORT*</a></code></h4>  </header> <div class="docstring"><pre>The standard port on which the server will run.
 
-Should be 1113.</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:CHANNEL"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:CHANNEL">CHANNEL</a></code></h4>  </header> <pre class="docstring">Channel class.
+Should be 1113.</pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:CHANNEL"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:CHANNEL">CHANNEL</a></code></h4>  </header> <div class="docstring"><pre>Channel class.
 
 Access to the channel is properly handled for
 mutual exclusion from threads by its LOCK. Particularly,
@@ -84,8 +84,8 @@ the following methods are mutually excluded via this lock:
   LICHAT-SERVERLIB:JOIN
   LICHAT-SERVERLIB:LEAVE
 
-See LICHAT-SERVERLIB:CHANNEL
-See LOCK</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:CONNECTION"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:CONNECTION">CONNECTION</a></code></h4>  </header> <pre class="docstring">Connection class. Each connection to a client will have an instance of this class.
+See <a href="#LICHAT-WS-SERVER:CHANNEL">LICHAT-SERVERLIB:CHANNEL</a>
+See <a href="#LICHAT-WS-SERVER:LOCK">LOCK</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:CONNECTION"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:CONNECTION">CONNECTION</a></code></h4>  </header> <div class="docstring"><pre>Connection class. Each connection to a client will have an instance of this class.
 
 Access to the connection is properly handled for
 mutual exclusion from threads by its LOCK. Particularly,
@@ -93,10 +93,10 @@ the following methods are mutually excluded via this lock:
 
   LICHAT-SERVERLIB:SEND
 
-See LICHAT-SERVERLIB:FLOOD-PROTECTED-CONNECTION
-See HUNCHENSOCKET:WEBSOCKET-CLIENT
-See STATUS
-See LOCK</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:SERVER"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></code></h4>  </header> <pre class="docstring">Server class. You should instantiate this.
+See <a href="NIL">LICHAT-SERVERLIB:FLOOD-PROTECTED-CONNECTION</a>
+See <a href="NIL">HUNCHENSOCKET:WEBSOCKET-CLIENT</a>
+See <a href="#LICHAT-WS-SERVER:STATUS">STATUS</a>
+See <a href="#LICHAT-WS-SERVER:LOCK">LOCK</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:SERVER"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></code></h4>  </header> <div class="docstring"><pre>Server class. You should instantiate this.
 
 Access to the server is properly handled for
 mutual exclusion from threads by its LOCK. Particularly,
@@ -108,15 +108,15 @@ are mutually excluded via this lock:
  LICHAT-PROTOCOL:REGISTER
  LICHAT-PROTOCOL:CREATE
 
-See LICHAT-SERVERLIB:FLOOD-PROTECTED-SERVER
-See HUNCHENSOCKET:WEBSOCKET-RESOURCE
-See HOSTNAME
-See PORT
-See ACCEPTOR
-See THREAD
-See PING-INTERVAL
-See LOCK
-See CONNECTIONS</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:USER"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:USER">USER</a></code></h4>  </header> <pre class="docstring">User class.
+See <a href="NIL">LICHAT-SERVERLIB:FLOOD-PROTECTED-SERVER</a>
+See <a href="NIL">HUNCHENSOCKET:WEBSOCKET-RESOURCE</a>
+See <a href="#LICHAT-WS-SERVER:HOSTNAME">HOSTNAME</a>
+See <a href="#LICHAT-WS-SERVER:PORT">PORT</a>
+See <a href="NIL">ACCEPTOR</a>
+See <a href="#LICHAT-WS-SERVER:THREAD">THREAD</a>
+See <a href="#LICHAT-WS-SERVER:PING-INTERVAL">PING-INTERVAL</a>
+See <a href="#LICHAT-WS-SERVER:LOCK">LOCK</a>
+See <a href="#LICHAT-WS-SERVER:CONNECTIONS">CONNECTIONS</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:USER"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#LICHAT-WS-SERVER:USER">USER</a></code></h4>  </header> <div class="docstring"><pre>User class.
 
 Access to the user is properly handled for
 mutual exclusion from threads by its LOCK. Particularly,
@@ -125,45 +125,45 @@ the following methods are mutually excluded via this lock:
   LICHAT-SERVERLIB:JOIN
   LICHAT-SERVERLIB:LEAVE
 
-See LICHAT-SERVERLIB:USER
-See LOCK</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:CONNECTION-LIMIT"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:CONNECTION-LIMIT">CONNECTION-LIMIT</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring"/> </article> </li><li> <a name="LICHAT-WS-SERVER:CONNECTIONS"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:CONNECTIONS">CONNECTIONS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the list of connections on the server.
+See <a href="#LICHAT-WS-SERVER:USER">LICHAT-SERVERLIB:USER</a>
+See <a href="#LICHAT-WS-SERVER:LOCK">LOCK</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:CONNECTION-LIMIT"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:CONNECTION-LIMIT">CONNECTION-LIMIT</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><i>No docstring provided.</i></div> </article> </li><li> <a name="LICHAT-WS-SERVER:CONNECTIONS"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:CONNECTIONS">CONNECTIONS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the list of connections on the server.
 
-See SERVER
-See CONNECTION</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:HOSTNAME"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:HOSTNAME">HOSTNAME</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the hostname of the object.
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a>
+See <a href="#LICHAT-WS-SERVER:CONNECTION">CONNECTION</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:HOSTNAME"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:HOSTNAME">HOSTNAME</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the hostname of the object.
 
-See SERVER</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:LOCK"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:LOCK">LOCK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the lock of the object that is used to mutually exclude access.
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:LOCK"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:LOCK">LOCK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the lock of the object that is used to mutually exclude access.
 
-See SERVER 
-See CONNECTION
-See USER
-See CHANNEL</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:PING-INTERVAL"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:PING-INTERVAL">PING-INTERVAL</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the amount of seconds to wait for an update before sending a PING.
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a> 
+See <a href="#LICHAT-WS-SERVER:CONNECTION">CONNECTION</a>
+See <a href="#LICHAT-WS-SERVER:USER">USER</a>
+See <a href="#LICHAT-WS-SERVER:CHANNEL">CHANNEL</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:PING-INTERVAL"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:PING-INTERVAL">PING-INTERVAL</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the amount of seconds to wait for an update before sending a PING.
 
-See SERVER</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:PORT"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:PORT">PORT</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the port of the object.
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:PORT"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:PORT">PORT</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the port of the object.
 
-See SERVER
-See *DEFAULT-PORT*</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:STATUS"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:STATUS">STATUS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the status of the connection.
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a>
+See <a href="#LICHAT-WS-SERVER:*DEFAULT-PORT*">*DEFAULT-PORT*</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:STATUS"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:STATUS">STATUS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the status of the connection.
 
 The value should be one of :STARTING :RUNNING :STOPPING
 
-See CONNECTION</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:THREAD"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:THREAD">THREAD</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Accessor to the background ping thread of the server.
+See <a href="#LICHAT-WS-SERVER:CONNECTION">CONNECTION</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:THREAD"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:THREAD">THREAD</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <div class="docstring"><pre>Accessor to the background ping thread of the server.
 
-See SERVER</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:CLOSE-CONNECTION"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:CLOSE-CONNECTION">CLOSE-CONNECTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SERVER</code><code>)</code>  </header> <pre class="docstring">Stop accepting incoming connections and close all existing ones.
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:CLOSE-CONNECTION"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:CLOSE-CONNECTION">CLOSE-CONNECTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SERVER</code><code>)</code>  </header> <div class="docstring"><pre>Stop accepting incoming connections and close all existing ones.
 
-See CONNECTIONS
-See THREAD
-See SERVER</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:HANDLE-PINGS"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:HANDLE-PINGS">HANDLE-PINGS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SERVER</code><code>)</code>  </header> <pre class="docstring">This function will loop on the server and send ping requests in a regular interval to clients that have not replied in a while.
+See <a href="#LICHAT-WS-SERVER:CONNECTIONS">CONNECTIONS</a>
+See <a href="#LICHAT-WS-SERVER:THREAD">THREAD</a>
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:HANDLE-PINGS"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:HANDLE-PINGS">HANDLE-PINGS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SERVER</code><code>)</code>  </header> <div class="docstring"><pre>This function will loop on the server and send ping requests in a regular interval to clients that have not replied in a while.
 
 During the processing a restart called STOP-HANDLING
 is active that, when invoked, exits the function.
 
-See PING-INTERVAL
-See SERVER</pre> </article> </li><li> <a name="LICHAT-WS-SERVER:OPEN-CONNECTION"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:OPEN-CONNECTION">OPEN-CONNECTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SERVER</code><code>)</code>  </header> <pre class="docstring">Start accepting incoming connections on the server.
+See <a href="#LICHAT-WS-SERVER:PING-INTERVAL">PING-INTERVAL</a>
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></pre></div> </article> </li><li> <a name="LICHAT-WS-SERVER:OPEN-CONNECTION"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#LICHAT-WS-SERVER:OPEN-CONNECTION">OPEN-CONNECTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SERVER</code><code>)</code>  </header> <div class="docstring"><pre>Start accepting incoming connections on the server.
 
 This will launch a background thread which will call
 HANDLE-PINGS on the server. It will also construct
 and start the Hunchentoot acceptor of the server.
 
-See HANDLE-PINGS
-See THREAD
-See ACCEPTOR
-See SERVER</pre> </article> </li></ul> </li></ul> </article>  </main> </body> </html> 
+See <a href="#LICHAT-WS-SERVER:HANDLE-PINGS">HANDLE-PINGS</a>
+See <a href="#LICHAT-WS-SERVER:THREAD">THREAD</a>
+See <a href="NIL">ACCEPTOR</a>
+See <a href="#LICHAT-WS-SERVER:SERVER">SERVER</a></pre></div> </article> </li></ul> </li></ul> </article>  </main> </body> </html> 
