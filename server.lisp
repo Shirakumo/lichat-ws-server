@@ -117,13 +117,15 @@
          (push connection (connections server)))))
 
 (defmethod hunchensocket:client-disconnected ((server server) (connection connection))
-  (lichat-serverlib:teardown-connection connection))
+  (ignore-errors
+   (lichat-serverlib:teardown-connection connection))
+  (setf (connections server) (remove connection (connections server))))
 
 (defmethod hunchensocket:text-message-received ((server server) (connection connection) message)
   (v:trace :licht.server.ws "~a: Handling ~s" connection message)
   (restart-case
-      (with-input-from-string (in message)
-        (handler-case
+      (handler-case
+          (with-input-from-string (in message)
             (case (status connection)
               (:running
                (lichat-serverlib:process connection in))
@@ -137,12 +139,12 @@
                  (lichat-protocol:wire-condition (err)
                    (lichat-serverlib:send! connection 'malformed-update
                                            :text (princ-to-string err))
-                   (invoke-restart 'lichat-serverlib:close-connection)))))
-          (error (err)
-            (v:error :lichat.server.ws err)
-            (lichat-serverlib:send! connection 'failure
-                                    :text (princ-to-string err))
-            (invoke-restart 'lichat-serverlib:close-connection))))
+                   (invoke-restart 'lichat-serverlib:close-connection))))))
+        (error (err)
+          (v:error :lichat.server.ws err)
+          (lichat-serverlib:send! connection 'failure
+                                  :text (princ-to-string err))
+          (invoke-restart 'lichat-serverlib:close-connection)))
     (lichat-serverlib:close-connection ()
       :report "Close the connection."
       (lichat-serverlib:teardown-connection connection))))
@@ -160,10 +162,12 @@
   (let ((message (with-output-to-string (output)
                    (lichat-protocol:to-wire object output))))
     (bt:with-recursive-lock-held ((lock connection))
-      (handler-case
-          (hunchensocket:send-text-message connection message)
-        (error (err)
-          (v:severe :lichat.server.ws "Failed to send to ~s: ~a" connection err))))))
+      (restart-case
+          (handler-bind ((error #'abort))
+            (hunchensocket:send-text-message connection message))
+        (abort (&optional err)
+          :report "Give up trying to send."
+          (v:severe :lichat.server.ws "Failed to send to ~s~@[ ~a~]" connection err))))))
 
 ;;; Handle synchronising
 ;; FIXME: I'm not entirely convinced the mutual exclusion
@@ -180,8 +184,11 @@
 
 (defmethod lichat-serverlib:teardown-connection :around ((connection connection))
   (bt:with-recursive-lock-held ((lock (lichat-serverlib:server connection)))
-    (bt:with-recursive-lock-held ((lock (lichat-protocol:user connection)))
-      (call-next-method))))
+    (let ((user (lichat-protocol:user connection)))
+      (if user
+          (bt:with-recursive-lock-held ((lock user))
+            (call-next-method))
+          (call-next-method)))))
 
 (defmethod lichat-serverlib:process :around ((connection connection) (update lichat-protocol:register))
   (bt:with-recursive-lock-held ((lock (lichat-serverlib:server connection)))
