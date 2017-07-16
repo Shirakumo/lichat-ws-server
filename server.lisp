@@ -34,12 +34,6 @@
   (:default-initargs
    :user NIL))
 
-(defmethod print-object ((connection connection) stream)
-  (print-unreadable-object (connection stream :type T)
-    (format stream "~a/~a"
-            (when (lichat-serverlib:server connection) (lichat-protocol:name (lichat-serverlib:server connection)))
-            (when (lichat-protocol:user connection) (lichat-protocol:name (lichat-protocol:user connection))))))
-
 (defclass channel (lichat-serverlib:channel)
   ((lock :initform (bt:make-recursive-lock) :accessor lock)))
 
@@ -122,7 +116,6 @@
   (setf (connections server) (remove connection (connections server))))
 
 (defmethod hunchensocket:text-message-received ((server server) (connection connection) message)
-  (v:trace :licht.server.ws "~a: Handling ~s" connection message)
   (restart-case
       (handler-case
           (with-input-from-string (in message)
@@ -158,7 +151,6 @@
       (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect")))))
 
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
-  (v:trace :lichat.server.ws "~a: Sending ~s to ~a" (lichat-serverlib:server connection) object connection)
   (let ((message (with-output-to-string (output)
                    (lichat-protocol:to-wire object output))))
     (bt:with-recursive-lock-held ((lock connection))
