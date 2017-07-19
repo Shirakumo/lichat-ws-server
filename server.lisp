@@ -142,13 +142,14 @@
       :report "Close the connection."
       (lichat-serverlib:teardown-connection connection))))
 
-(defmethod lichat-serverlib:teardown-connection :after ((connection connection))
+(defmethod lichat-serverlib:teardown-connection :around ((connection connection))
   (unless (eql (status connection) :stopping)
     (let ((server (lichat-serverlib:server connection)))
       (v:info :lichat.server.ws "~a: Closing ~a" server connection)
-      (setf (status connection) :stopping)
-      (setf (connections server) (remove connection (connections server)))
-      (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect")))))
+      (unwind-protect (call-next-method)
+        (setf (status connection) :stopping)
+        (setf (connections server) (remove connection (connections server)))
+        (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))))))
 
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
   (let ((message (with-output-to-string (output)
