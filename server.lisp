@@ -142,7 +142,7 @@
       :report "Close the connection."
       (lichat-serverlib:teardown-connection connection))))
 
-(defmethod lichat-serverlib:teardown-connection :around ((connection connection))
+(defmethod lichat-serverlib:teardown-connection ((connection connection))
   (unless (eql (status connection) :stopping)
     (let ((server (lichat-serverlib:server connection)))
       (v:info :lichat.server.ws "~a: Closing ~a" server connection)
