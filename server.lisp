@@ -84,9 +84,10 @@
 
 (defmethod handle-pings ((server server))
   (with-simple-restart (stop-handling "Stop handling pings.")
-    (loop for counter = 1 then (mod (1+ counter) (* 10 (ping-interval server)))
+    (loop with time = (get-universal-time)
           do (sleep 0.1)
-             (when (= 0 counter)
+             (when (<= (ping-interval server) (- time (get-universal-time)))
+               (setf time (get-universal-time))
                (dolist (connection (connections server))
                  (handler-case
                      (when (and (eql :running (status connection))
@@ -141,11 +142,13 @@
     (bt:with-recursive-lock-held ((lock connection))
       (handler-case (hunchensocket:send-text-message connection message)
         (error (err)
-          (v:severe :lichat.server.ws "Failed to send to ~s~@[ ~a~]" connection err))))))
+          (v:error :lichat.server.ws err)
+          (lichat-serverlib:teardown-connection connection))))))
 
 (defmethod lichat-serverlib:teardown-connection :after ((connection connection))
-  (setf (status connection) :stopping)
-  (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect")))
+  (unless (eql :stopping (status connection))
+    (setf (status connection) :stopping)
+    (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))))
 
 ;;; Handle synchronising
 ;; FIXME: I'm not entirely convinced the mutual exclusion
