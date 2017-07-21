@@ -23,7 +23,7 @@
    :name (machine-instance)
    :hostname "localhost"
    :port *default-port*
-   :ping-interval 60
+   :ping-interval 10
    :connection-limit 100
    :client-class 'connection))
 
