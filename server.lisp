@@ -92,11 +92,7 @@
                      (when (and (eql :running (status connection))
                                 (<= (ping-interval server)
                                     (- (get-universal-time) (lichat-serverlib:last-update connection))))
-                       (restart-case
-                           (lichat-serverlib:send! connection 'ping)
-                         (lichat-serverlib:close-connection ()
-                           :report "Close the connection."
-                           (lichat-serverlib:teardown-connection connection))))
+                       (lichat-serverlib:send! connection 'ping))
                    (error (err)
                      (v:warn :lichat.server.ws err)))))))
   (v:info :lichat.server.ws "Ping handling has stopped."))
@@ -108,59 +104,48 @@
          (lichat-serverlib:send! connection 'too-many-connections)
          (ignore-errors (hunchensocket:close-connection connection :reason "Too many connections.")))
         (T
-         (push connection (connections server)))))
+         (bt:with-recursive-lock-held ((lock server))
+           (push connection (connections server))))))
 
 (defmethod hunchensocket:client-disconnected ((server server) (connection connection))
-  (ignore-errors
-   (lichat-serverlib:teardown-connection connection))
-  (setf (connections server) (remove connection (connections server))))
+  (ignore-errors (lichat-serverlib:teardown-connection connection))
+  (v:info :lichat.server.ws "~a: Closing." connection)
+  (bt:with-recursive-lock-held ((lock server))
+    (setf (connections server) (remove connection (connections server)))))
 
 (defmethod hunchensocket:text-message-received ((server server) (connection connection) message)
-  (restart-case
-      (handler-case
-          (with-input-from-string (in message)
-            (case (status connection)
-              (:running
-               (lichat-serverlib:process connection in))
-              (:starting
-               (handler-case
-                   (let ((message (lichat-protocol:from-wire in)))
-                     (etypecase message
-                       (lichat-protocol:connect
-                        (lichat-serverlib:process connection message)))
-                     (setf (status connection) :running))
-                 (lichat-protocol:wire-condition (err)
-                   (lichat-serverlib:send! connection 'malformed-update
-                                           :text (princ-to-string err))
-                   (invoke-restart 'lichat-serverlib:close-connection))))))
-        (error (err)
-          (v:error :lichat.server.ws err)
-          (lichat-serverlib:send! connection 'failure
-                                  :text (princ-to-string err))
-          (invoke-restart 'lichat-serverlib:close-connection)))
-    (lichat-serverlib:close-connection ()
-      :report "Close the connection."
+  (handler-case
+      (with-input-from-string (in message)
+        (case (status connection)
+          (:starting
+           (handler-case
+               (let ((message (lichat-protocol:from-wire in)))
+                 (unless (typep message 'lichat-protocol:connect)
+                   (error "Expected CONNECT update."))
+                 (lichat-serverlib:process connection message)
+                 (setf (status connection) :running))
+             (lichat-protocol:wire-condition (err)
+               (lichat-serverlib:send! connection 'malformed-update
+                                       :text (princ-to-string err))
+               (lichat-serverlib:teardown-connection connection))))
+          (:running
+           (lichat-serverlib:process connection in))))
+    (error (err)
+      (v:error :lichat.server.ws err)
+      (lichat-serverlib:send! connection 'failure
+                              :text (princ-to-string err))
       (lichat-serverlib:teardown-connection connection))))
 
-(defmethod lichat-serverlib:teardown-connection ((connection connection))
-  (unless (eql (status connection) :stopping)
-    (let ((server (lichat-serverlib:server connection)))
-      (v:info :lichat.server.ws "~a: Closing ~a" server connection)
-      (unwind-protect (call-next-method)
-        (setf (status connection) :stopping)
-        (setf (connections server) (remove connection (connections server)))
-        (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect"))))))
-
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
-  (let ((message (with-output-to-string (output)
-                   (lichat-protocol:to-wire object output))))
+  (let ((message (with-output-to-string (output) (lichat-protocol:to-wire object output))))
     (bt:with-recursive-lock-held ((lock connection))
-      (restart-case
-          (handler-bind ((error #'abort))
-            (hunchensocket:send-text-message connection message))
-        (abort (&optional err)
-          :report "Give up trying to send."
+      (handler-case (hunchensocket:send-text-message connection message)
+        (error (err)
           (v:severe :lichat.server.ws "Failed to send to ~s~@[ ~a~]" connection err))))))
+
+(defmethod lichat-serverlib:teardown-connection :after ((connection connection))
+  (setf (status connection) :stopping)
+  (ignore-errors (hunchensocket:close-connection connection :reason "Disconnect")))
 
 ;;; Handle synchronising
 ;; FIXME: I'm not entirely convinced the mutual exclusion
