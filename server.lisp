@@ -137,6 +137,9 @@
                               :text (princ-to-string err))
       (lichat-serverlib:teardown-connection connection))))
 
+(defmethod hunchensocket:check-message ((resource hunchensocket:websocket-resource) (client connection) opcode length total)
+  (declare (ignore resource client opcode length total)))
+
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
   (let ((message (with-output-to-string (output) (lichat-protocol:to-wire object output))))
     (bt:with-recursive-lock-held ((lock connection))
