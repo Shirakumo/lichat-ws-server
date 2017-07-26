@@ -120,7 +120,7 @@
         (case (status connection)
           (:starting
            (handler-case
-               (let ((message (lichat-protocol:from-wire in)))
+               (let ((message (lichat-protocol:from-wire in (lichat-serverlib:read-limit connection))))
                  (unless (typep message 'lichat-protocol:connect)
                    (error "Expected CONNECT update."))
                  (lichat-serverlib:process connection message)
@@ -137,8 +137,14 @@
                               :text (princ-to-string err))
       (lichat-serverlib:teardown-connection connection))))
 
-(defmethod hunchensocket:check-message ((resource hunchensocket:websocket-resource) (client connection) opcode length total)
-  (declare (ignore resource client opcode length total)))
+(defmethod hunchensocket:check-message ((resource hunchensocket:websocket-resource) (connection connection) opcode length total)
+  (declare (ignore resource opcode total))
+  ;; Right now this will hard-close the connection, which is far from ideal.
+  ;; Ideally we would just read from the stream until the fragment is over, but
+  ;; that's a bit more complicated than I'm willing to try and figure out right now.
+  (when (and (lichat-serverlib:read-limit connection)
+             (<= (* 4 (lichat-serverlib:read-limit connection)) length))
+    (hunchensocket::websocket-error 1009 "Message fragment too big")))
 
 (defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
   (let ((message (with-output-to-string (output) (lichat-protocol:to-wire object output))))
