@@ -10,7 +10,9 @@
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :description "A simple WebSocket server implementation for lichat."
-  :homepage "https://github.com/Shirakumo/lichat-ws-server"
+  :homepage "https://Shirakumo.github.io/lichat-ws-server/"
+  :bug-tracker "https://github.com/Shirakumo/lichat-ws-server/issues"
+  :source-control (:git "https://github.com/Shirakumo/lichat-ws-server.git")
   :serial T
   :components ((:file "package")
                (:file "server")
