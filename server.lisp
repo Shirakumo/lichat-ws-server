@@ -146,7 +146,7 @@
              (<= (* 4 (lichat-serverlib:read-limit connection)) length))
     (hunchensocket::websocket-error 1009 "Message fragment too big")))
 
-(defmethod lichat-serverlib:send ((object lichat-protocol:wire-object) (connection connection))
+(defmethod lichat-serverlib:send ((object lichat-protocol:object) (connection connection))
   (let ((message (with-output-to-string (output) (lichat-protocol:to-wire object output))))
     (bt:with-recursive-lock-held ((lock connection))
       (handler-case (hunchensocket:send-text-message connection message)
@@ -200,6 +200,6 @@
     (bt:with-recursive-lock-held ((lock channel))
       (call-next-method))))
 
-(defmethod lichat-serverlib:send :around ((object lichat-protocol:wire-object) (channel channel))
+(defmethod lichat-serverlib:send :around ((object lichat-protocol:object) (channel channel))
   (bt:with-recursive-lock-held ((lock channel))
     (call-next-method)))
