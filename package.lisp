@@ -7,6 +7,7 @@
 (in-package #:cl-user)
 (defpackage #:lichat-ws-server
   (:nicknames #:org.shirakumo.lichat.ws-server)
+  (:local-nicknames (#:v #:org.shirakumo.verbose))
   (:use #:cl)
   (:export
    #:*default-port*
